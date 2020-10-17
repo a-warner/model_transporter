@@ -1,3 +1,5 @@
+require 'rails/railtie'
+
 module ModelTransporter
   class Railtie < Rails::Railtie
     initializer "model_transporter.batch_model_updates.setup" do |app|

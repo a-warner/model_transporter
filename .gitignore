@@ -9,3 +9,5 @@
 
 # rspec failure tracking
 .rspec_status
+spec/test_app/node_modules/
+spec/test_app/tmp/

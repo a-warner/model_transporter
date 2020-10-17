@@ -1,3 +1,4 @@
+require 'active_support/all'
 require "model_transporter/version"
 require "model_transporter/notifies_model_updates"
 require "model_transporter/batch_model_updates"

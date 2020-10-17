@@ -29,8 +29,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "listen"
+  spec.add_development_dependency "sqlite3", "~> 1.4"
+  spec.add_development_dependency "sass-rails", '>= 6'
+  spec.add_development_dependency "webpacker", "~> 4.0"
 
   spec.add_dependency "rails", "~> 6.0"
   spec.add_dependency "request_store"

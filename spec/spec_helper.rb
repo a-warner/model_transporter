@@ -1,6 +1,11 @@
 require "bundler/setup"
 require "model_transporter"
 
+require File.expand_path('../spec/test_app/config/environment.rb', __dir__)
+ENV['RAILS_ROOT'] ||= File.dirname(__FILE__) + '../../../spec/testapp'
+
+require 'rspec/rails'
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
