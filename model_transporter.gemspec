@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3", "~> 1.4"
   spec.add_development_dependency "sass-rails", '>= 6'
   spec.add_development_dependency "webpacker", "~> 4.0"
+  spec.add_development_dependency "pry"
 
   spec.add_dependency "rails", "~> 6.0"
   spec.add_dependency "request_store"

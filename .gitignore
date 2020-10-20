@@ -11,3 +11,6 @@
 .rspec_status
 spec/test_app/node_modules/
 spec/test_app/tmp/
+spec/test_app/db/development.sqlite3
+spec/test_app/log/development.log
+tags
