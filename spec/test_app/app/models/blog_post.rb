@@ -4,5 +4,4 @@ class BlogPost < ApplicationRecord
 
   validates :title, presence: true
 
-  notifies_model_updates channel: 'AdminChannel', channel_model: -> { 'all' }
 end
