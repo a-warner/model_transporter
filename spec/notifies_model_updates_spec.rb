@@ -16,19 +16,12 @@ RSpec.describe ModelTransporter::NotifiesModelUpdates do
 
   it "doesn't enqueue model updates for unregistered models" do
     expect(ModelTransporter::BatchModelUpdates).not_to receive(:enqueue_model_updates)
-    new_blog_post.save!
-
-    new_blog_post.update!(title: 'test')
-    new_blog_post.destroy
+    test_user = User.create!(username: 'New user')
+    test_user.update!(username: 'New user 2')
+    test_user.destroy
   end
 
   describe 'when model updates are configured' do
-    before(:all) do
-      BlogPost.class_eval do
-        notifies_model_updates channel: 'AdminChannel', channel_model: -> { 'all' }
-      end
-    end
-
     it 'enqueues model updates on create' do
       expect(ModelTransporter::BatchModelUpdates).to receive(:enqueue_model_updates) { |broadcasting_key, payload|
         expect(broadcasting_key).to eq AdminChannel.broadcasting_for('all')

@@ -3,4 +3,6 @@ class BlogPost < ApplicationRecord
   has_many :comments
 
   validates :title, presence: true
+
+  notifies_model_updates channel: 'AdminChannel', channel_model: -> { 'all' }
 end

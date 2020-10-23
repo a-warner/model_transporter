@@ -14,3 +14,5 @@ spec/test_app/tmp/
 spec/test_app/db/development.sqlite3
 spec/test_app/log/development.log
 tags
+spec/test_app/db/test.sqlite3
+spec/test_app/log/test.log
