@@ -79,5 +79,13 @@ RSpec.describe ModelTransporter::NotifiesModelUpdates do
 
       blog_post.destroy!
     end
+
+    it 'enqueues multiple updates' do
+      blog_post = saved_blog_post
+      expect(ModelTransporter::BatchModelUpdates).to receive(:enqueue_model_updates).twice
+
+      saved_blog_post.update!(title: 'First update')
+      saved_blog_post.update!(title: 'Second update')
+    end
   end
 end
