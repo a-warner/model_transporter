@@ -15,6 +15,7 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
         @blog_post = BlogPost.find(params[:blog_post_id])
 
         @comment = @blog_post.comments.create!(params.require(:comment).permit(:body, :author_id))
+        @blog_post.update!(comments_count: @blog_post.comments.count)
 
         render json: @comment
       end
@@ -35,12 +36,23 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
         title: 'Hello, world!'
       )
 
-      expect(ActionCable.server).to receive(:broadcast).once
+      expect(ActionCable.server).to receive(:broadcast).once { |broadcasting_key, message|
+        expect(broadcasting_key).to eq AdminChannel.broadcasting_for('all')
+        payload = message[:payload]
+
+        expect(payload[:updates]['blog_posts']).to match(
+          hash_including(blog_post.id => blog_post)
+        )
+
+        expect(payload[:creates]['comments'].values).to match(
+          array_including(having_attributes(body: 'Hello, comment!'))
+        )
+      }
 
       post :create, params: {
         blog_post_id: blog_post.id,
         comment: {
-          body: 'Hello, world!',
+          body: 'Hello, comment!',
           author_id: comment_author.id
         }
       }
