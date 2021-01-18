@@ -4,7 +4,7 @@ module ModelTransporter
   class Railtie < Rails::Railtie
     initializer "model_transporter.batch_model_updates.setup" do |app|
       ActiveSupport.on_load(:action_controller) do
-        ActionController::Base.send(:include, BatchModelUpdates)
+        ActionController::Base.send(:include, ControllerAdditions)
       end
     end
 
