@@ -8,15 +8,38 @@ module ModelTransporter::BatchModelUpdates
   end
 
   def self.enqueue_model_updates(broadcasting_key, message)
-    if outside_of_request_context?
-      cooked_message = base_model_update_message(acting_player_id: nil).merge(payload: message)
-      ActionCable.server.broadcast(broadcasting_key, cooked_message)
-    else
+    if updates_being_batched?
       current_model_updates[broadcasting_key] << message
+    else
+      cooked_message = base_model_update_message(actor_id: transporter_actor_id).merge(payload: message)
+      ActionCable.server.broadcast(broadcasting_key, cooked_message)
     end
   end
 
   private
+
+  def self.with_transporter_actor(actor)
+    RequestStore.store[:transporter_actor_id] = actor&.id
+    yield
+  ensure
+    RequestStore.store.delete(:transporter_actor_id)
+  end
+
+  def self.transporter_actor_id
+    RequestStore.store[:transporter_actor_id]
+  end
+
+  def with_transporter_actor(actor, &block)
+    ModelTransporter::BatchModelUpdates.with_transporter_actor(actor, &block)
+  end
+
+  def transporter_actor_id
+    if ModelTransporter::BatchModelUpdates.transporter_actor_id
+      ModelTransporter::BatchModelUpdates.transporter_actor_id
+    elsif ModelTransporter.configuration.actor
+      ModelTransporter.configuration.actor.to_proc.call(self)&.id
+    end
+  end
 
   def batch_model_updates
     RequestStore.store[:model_updates] = Hash.new { |h, k| h[k] = [] }
@@ -41,16 +64,16 @@ module ModelTransporter::BatchModelUpdates
     end
   end
 
-  def self.base_model_update_message(acting_player_id:)
+  def self.base_model_update_message(actor_id:)
     {
       type: MODEL_UPDATES_EVENT,
-      acting_player_id: acting_player_id,
+      actor_id: actor_id,
       payload: { creates: {}, updates: {}, deletes: {} }
     }
   end
 
   def base_model_update_message
-    ModelTransporter::BatchModelUpdates.base_model_update_message(acting_player_id: current_player&.id)
+    ModelTransporter::BatchModelUpdates.base_model_update_message(actor_id: transporter_actor_id)
   end
 
   def self.current_model_updates
@@ -61,8 +84,7 @@ module ModelTransporter::BatchModelUpdates
     ModelTransporter::BatchModelUpdates.current_model_updates
   end
 
-  def self.outside_of_request_context?
-    current_model_updates.nil?
+  def self.updates_being_batched?
+    !!current_model_updates
   end
 end
-
