@@ -2,6 +2,7 @@ module ModelTransporter
   module BatchModelUpdates
     extend self
     MODEL_UPDATES_EVENT = 'server_event/MODEL_UPDATES'
+    REQUEST_STORE_NAMESPACE = 'MODEL_TRANSPORTER'
 
     def enqueue_model_updates(channel, message)
       if updates_being_batched?
@@ -13,14 +14,14 @@ module ModelTransporter
     end
 
     def with_transporter_actor(actor)
-      RequestStore.store[:transporter_actor] = actor
+      RequestStore.store["#{REQUEST_STORE_NAMESPACE}.transporter_actor"] = actor
       yield
     ensure
-      RequestStore.store.delete(:transporter_actor)
+      RequestStore.store.delete("#{REQUEST_STORE_NAMESPACE}.transporter_actor")
     end
 
     def batch_model_updates
-      RequestStore.store[:model_updates] = Hash.new { |h, k| h[k] = [] }
+      RequestStore.store["#{REQUEST_STORE_NAMESPACE}.model_updates"] = Hash.new { |h, k| h[k] = [] }
 
       yield
     ensure
@@ -32,7 +33,7 @@ module ModelTransporter
     private
 
     def transporter_actor_id
-      case actor = RequestStore.store[:transporter_actor]
+      case actor = RequestStore.store["#{REQUEST_STORE_NAMESPACE}.transporter_actor"]
       when Proc
         actor.call&.id
       else
@@ -62,7 +63,7 @@ module ModelTransporter
     end
 
     def current_model_updates
-      RequestStore.store[:model_updates]
+      RequestStore.store["#{REQUEST_STORE_NAMESPACE}.model_updates"]
     end
 
     def updates_being_batched?
