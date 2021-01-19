@@ -66,7 +66,7 @@ RSpec.describe ModelTransporter::NotifiesModelUpdates do
         expect(payload[:updates]).to eq({})
 
         expect(payload[:deletes]['blog_posts']).to match(
-          hash_including(blog_post.id => blog_post)
+          hash_including(blog_post.id => {})
         )
       }
 
