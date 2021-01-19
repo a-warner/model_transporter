@@ -1,7 +1,15 @@
 CommentsController = Class.new(ApplicationController)
+BlogPostsController = Class.new(ApplicationController)
 
 RSpec.describe ModelTransporter::BatchModelUpdates do
-  let(:user) { User.create(username: 'Andrew') }
+  let!(:user) { User.create(username: 'Andrew') }
+
+  let!(:blog_post) do
+    BlogPost.create!(
+      author: user,
+      title: 'Hello, world!'
+    )
+  end
 
   it 'pushes model updates' do
     broadcasting_key = 'broadcasting_key'
@@ -34,6 +42,14 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
         render json: @comment
       end
 
+      def add_to_collection
+        @blog_post = BlogPost.find(params[:blog_post_id])
+        @collection = Collection.find(params[:collection_id])
+
+        @blog_post.update!(collection: @collection)
+        @collection.update!(blog_posts_count: @collection.blog_posts.count)
+      end
+
       protected
 
       def current_user
@@ -47,13 +63,7 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
       end
     end
 
-    let(:comment_author) { User.create(username: 'John') }
-    let!(:blog_post) do
-      BlogPost.create!(
-        author: user,
-        title: 'Hello, world!'
-      )
-    end
+    let!(:comment_author) { User.create(username: 'John') }
 
     specify 'batches model updates' do
       expect(ActionCable.server).to receive(:broadcast).once { |broadcasting_key, message|
@@ -106,6 +116,36 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
           }
         }
       end
+    end
+  end
+
+  describe 'request update batching separate channels', type: :controller do
+    controller BlogPostsController do
+      def add_to_collection
+        @blog_post = BlogPost.find(params[:blog_post_id])
+        @collection = Collection.find(params[:collection_id])
+
+        @blog_post.update!(collection: @collection)
+        @collection.update!(blog_posts_count: @collection.blog_posts.count)
+
+        render json: @blog_post
+      end
+    end
+
+    specify 'sends messages on different channels' do
+      routes.draw { post "add_to_collection" => "blog_posts#add_to_collection" }
+      collection = Collection.create!(name: 'Test collection')
+
+      expect(ActionCable.server).to receive(:broadcast).
+        with(AdminChannel.broadcasting_for('all'), anything)
+
+      expect(ActionCable.server).to receive(:broadcast).
+        with(CollectionChannel.broadcasting_for(collection), anything)
+
+      post :add_to_collection, params: {
+        blog_post_id: blog_post.id,
+        collection_id: collection
+      }
     end
   end
 end
