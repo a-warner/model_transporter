@@ -3,12 +3,12 @@ module ModelTransporter
     extend self
     MODEL_UPDATES_EVENT = 'server_event/MODEL_UPDATES'
 
-    def enqueue_model_updates(broadcasting_key, message)
+    def enqueue_model_updates(channel, message)
       if updates_being_batched?
-        current_model_updates[broadcasting_key] << message
+        current_model_updates[channel] << message
       else
         cooked_message = base_model_update_message.merge(payload: message)
-        ActionCable.server.broadcast(broadcasting_key, cooked_message)
+        push_update(channel, cooked_message)
       end
     end
 
@@ -24,8 +24,8 @@ module ModelTransporter
 
       yield
     ensure
-      consolidate_model_updates.each do |broadcasting_key, message|
-        ActionCable.server.broadcast(broadcasting_key, message)
+      consolidate_model_updates.each do |channel, message|
+        push_update(channel, message)
       end
     end
 
@@ -41,8 +41,8 @@ module ModelTransporter
     end
 
     def consolidate_model_updates
-      current_model_updates.each.with_object({}) do |(broadcasting_key, messages), consolidated_messages|
-        consolidated_messages[broadcasting_key] = messages.each.with_object(base_model_update_message) do |message, consolidated_message|
+      current_model_updates.each.with_object({}) do |(channel, messages), consolidated_messages|
+        consolidated_messages[channel] = messages.each.with_object(base_model_update_message) do |message, consolidated_message|
           message.each do |update_type, updated_models|
             updated_models.each do |model_name, models|
               consolidated_message[:payload][update_type][model_name] ||= {}
@@ -67,6 +67,10 @@ module ModelTransporter
 
     def updates_being_batched?
       !!current_model_updates
+    end
+
+    def push_update(channel, message)
+      ModelTransporter.configuration.push_adapter.push_update(channel, message)
     end
   end
 end

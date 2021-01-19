@@ -4,5 +4,5 @@ class Comment < ApplicationRecord
 
   validates :body, presence: true
 
-  notifies_model_updates channel: 'AdminChannel', channel_model: -> { 'all' }
+  notifies_model_updates channel: -> { AdminChannel.broadcasting_for('all') }
 end

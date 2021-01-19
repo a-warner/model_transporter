@@ -7,11 +7,8 @@ module ModelTransporter::NotifiesModelUpdates
   end
 
   class_methods do
-    def notifies_model_updates(channel:, channel_model:, on: %i(create update destroy))
-      self.notifies_model_updates_options = {
-        channel: channel,
-        channel_model: channel_model
-      }
+    def notifies_model_updates(channel:, on: %i(create update destroy))
+      self.notifies_model_updates_options = { channel: channel }
 
       if on.include?(:create)
         after_create_commit -> { notify_model_updates(:creates) }
@@ -28,14 +25,13 @@ module ModelTransporter::NotifiesModelUpdates
   end
 
   def notify_model_updates(update_type)
-    channel = self.class.notifies_model_updates_options[:channel].constantize
-    model = Array(instance_exec(&(self.class.notifies_model_updates_options[:channel_model])))
+    channel = instance_exec(&(self.class.notifies_model_updates_options[:channel]))
 
     payload = { creates: {}, updates: {}, deletes: {} }
     payload[update_type] = { self.class.name.pluralize.underscore => { self.id => self } }
 
     ModelTransporter::BatchModelUpdates.enqueue_model_updates(
-      channel.broadcasting_for(model),
+      channel,
       payload
     )
   end
