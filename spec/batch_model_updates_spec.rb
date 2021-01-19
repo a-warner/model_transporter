@@ -83,12 +83,14 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
     end
 
     context 'tracked actor' do
-      before do
-        ModelTransporter.configure { |config| config.actor = :current_user }
-      end
-
-      after do
-        ModelTransporter.configure { |config| config.actor = nil }
+      around do |example|
+        begin
+          previous_actor = ModelTransporter.configuration.actor
+          ModelTransporter.configure { |config| config.actor = :current_user }
+          example.run
+        ensure
+          ModelTransporter.configure { |config| config.actor = previous_actor }
+        end
       end
 
       specify 'sends actor id' do
