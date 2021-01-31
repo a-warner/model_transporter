@@ -4,6 +4,8 @@ Syndicate Rails model updates to your client-side Redux store via Action Cable.
 
 If you have many users viewing the same objects in different sessions, stored in Redux or a similar client-side store, `ModelTransporter` allows updates made by one client to flow to the others instantly. Since clients update models via web requests, `ModelTransporter` batches updates from each request together so that listeners see changes to all related objects at once.
 
+![](https://user-images.githubusercontent.com/952319/106395105-70b11b80-63ce-11eb-9391-61282809d477.png)
+
 ## Installation
 
 Add this line to your application's Gemfile:
