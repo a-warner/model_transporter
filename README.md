@@ -16,7 +16,7 @@ gem 'model_transporter'
 
 Sync updates for a model via:
 
-```
+```ruby
 class MyModel < ApplicationRecord
   notifies_model_updates channel: -> { MyChannel.broadcasting_for(self) }
 end
