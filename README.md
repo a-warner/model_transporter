@@ -93,7 +93,7 @@ Payloads follow a simple standard format:
 }
 ```
 
-`ModelTransporter` simply sends these messages, it is your job to handle them on the client side in the way that makes sense, e.g. by objects in your Redux store.
+`ModelTransporter` simply sends these messages, it is your job to handle them on the client side in the way that makes sense, e.g. by updating objects in your Redux store.
 
 ## Configuration options
 
