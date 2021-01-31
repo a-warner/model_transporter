@@ -24,7 +24,7 @@ end
 
 The `channel` tells `ModelTransporter` which listeners to notify, and also serves as a grouping key for updates within a single web request. In the above example, if you had a channel defined as:
 
-```
+```ruby
 class MyChannel < ApplicationCable::Channel
   def subscribed
     my_model = MyModel.find(params[:id])
@@ -37,7 +37,7 @@ Then any client connected to that channel would receive push updates for changes
 
 If you had a TodoList app with `TodoList` objects that were shared between users, `Todo`s that belong to `TodoList`s, and `TodoComment`s that belong to `Todo`s, you could set it up as follows to ensure all clients on the same `TodoList` page get real-time updates from other users to stay in sync:
 
-```
+```ruby
 class TodoList < ApplicationRecord
   has_many :todos, dependent: :destroy
 
@@ -95,7 +95,7 @@ Payloads follow a simple standard format:
 
 ## Configuration options
 
-```
+```ruby
 ModelTransporter.configure do |config|
   config.actor = :current_user
   config.push_adapter = MyPushAdapter.new
