@@ -107,6 +107,16 @@ end
 - `actor`: `ModelTransporter` includes an `actor_id` in message payloads, which can be useful if you want to determine who triggered a model update. If you have a controller method called `current_user`, you can set `actor` equal to `:current_user`, and `actor_id` in transporter payloads will get set to that user
 - `push_adapter`: by default `ModelTransporter` assumes you want to send updates via `ActionCable`. If you want to send updates in another way, e.g. something like `Pusher`, set a custom `push_adapter` to anything that responds to `push_update(channel, message)`.
 
+## Batching updates manually
+
+If you want to batch updates outside of a web request, e.g. if you are updating models in a background job, or as a result of messages received over websockets, you can manually batch all updates inside of a block via:
+
+```ruby
+ModelTransporter::BatchModelUpdates.batch_model_updates do
+  # update multiple models
+end
+```
+
 ## Run the specs
 
 `rake spec`
