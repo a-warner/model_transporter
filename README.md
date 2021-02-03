@@ -93,7 +93,7 @@ Payloads follow a simple standard format:
 }
 ```
 
-`ModelTransporter` simply sends these messages, it is your job to handle them on the client side in the way that makes sense, e.g. by updating objects in your Redux store.
+`ModelTransporter` simply sends these messages, by default serializing objects as json by calling `as_json`, it is your job to handle them on the client side in the way that makes sense, e.g. by updating objects in your Redux store.
 
 ## Configuration options
 
@@ -105,7 +105,21 @@ end
 ```
 
 - `actor`: `ModelTransporter` includes an `actor_id` in message payloads, which can be useful if you want to determine who triggered a model update. If you have a controller method called `current_user`, you can set `actor` equal to `:current_user`, and `actor_id` in transporter payloads will get set to that user
-- `push_adapter`: by default `ModelTransporter` assumes you want to send updates via `ActionCable`. If you want to send updates in another way, e.g. something like `Pusher`, set a custom `push_adapter` to anything that responds to `push_update(channel, message)`.
+- `push_adapter`: by default `ModelTransporter` assumes you want to send updates via `ActionCable`. If you want to send updates in another way, e.g. something like `Pusher`, set a custom `push_adapter` to anything that responds to `push_update(channel, message)`. The default action cable push adapter, for reference, is:
+
+```ruby
+# lib/model_transporter/pusher_adapter/action_cable.rb
+module ModelTransporter
+  module PushAdapter
+    class ActionCable
+      def push_update(channel, message)
+        # broadcast can take a coder option as well, which by default is `coder: ActiveSupport::JSON`
+        ::ActionCable.server.broadcast(channel, message)
+      end
+    end
+  end
+end
+```
 
 ## Batching updates manually
 
