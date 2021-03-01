@@ -148,4 +148,57 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
       }
     end
   end
+
+  describe 'manually batches updates' do
+    specify 'sends one push for multiple updates' do
+      expect(ActionCable.server).to receive(:broadcast).once
+
+      ModelTransporter::BatchModelUpdates.batch_model_updates do
+        post = BlogPost.create!(
+          author: user,
+          title: 'Test post'
+        )
+
+        Comment.create!(
+          author: user,
+          blog_post: post,
+          body: 'commenting on my own post'
+        )
+      end
+    end
+
+    specify 'sends a fresh message each time' do
+      post = nil
+
+      ModelTransporter::BatchModelUpdates.batch_model_updates do
+        post = BlogPost.create!(
+          author: user,
+          title: 'Test post'
+        )
+
+        Comment.create!(
+          author: user,
+          blog_post: post,
+          body: 'commenting on my own post'
+        )
+      end
+
+      expect(ActionCable.server).to receive(:broadcast).once { |broadcasting_key, message|
+        expect(broadcasting_key).to eq AdminChannel.broadcasting_for('all')
+        payload = message[:payload]
+
+        expect(payload[:creates]['blog_posts']).to be_blank
+
+        expect(payload[:creates]['comments'].values.size).to eq(1)
+      }
+
+      ModelTransporter::BatchModelUpdates.batch_model_updates do
+        Comment.create!(
+          author: user,
+          blog_post: post,
+          body: 'commenting on my own post again'
+        )
+      end
+    end
+  end
 end

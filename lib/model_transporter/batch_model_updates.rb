@@ -28,6 +28,8 @@ module ModelTransporter
       consolidate_model_updates.each do |channel, message|
         push_update(channel, message)
       end
+
+      RequestStore.store.delete("#{REQUEST_STORE_NAMESPACE}.model_updates")
     end
 
     private
