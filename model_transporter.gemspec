@@ -36,6 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "webpacker", "~> 4.0"
   spec.add_development_dependency "pry"
 
-  spec.add_dependency "rails", "~> 6.0"
+  spec.add_dependency "rails", "~> 6.1.3.2"
   spec.add_dependency "request_store"
 end
