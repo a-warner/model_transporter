@@ -7,9 +7,17 @@ module ModelTransporter
     end
 
     def batch_model_updates(&block)
-      if ModelTransporter.configuration.actor
+      if (actor_config = ModelTransporter.configuration.actor)
+        controller = self
         actor = Proc.new do
-          ModelTransporter.configuration.actor.to_proc.call(self)
+          if actor_config.respond_to?(:call)
+            actor_config.call(controller)
+          else
+            # `send` rather than `to_proc`, so non-public helpers such as a
+            # protected `current_user` work (Symbol#to_proc could call
+            # protected methods on Ruby 3.0, but not on Ruby 3.2+).
+            controller.send(actor_config)
+          end
         end
       end
 

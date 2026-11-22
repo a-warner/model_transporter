@@ -116,6 +116,22 @@ RSpec.describe ModelTransporter::BatchModelUpdates do
           }
         }
       end
+
+      specify 'accepts a proc that receives the controller' do
+        ModelTransporter.configure { |config| config.actor = ->(controller) { controller.send(:current_user) } }
+
+        expect(ActionCable.server).to receive(:broadcast).once { |broadcasting_key, message|
+          expect(message[:actor_id]).to eq(comment_author.id)
+        }
+
+        post :create, params: {
+          blog_post_id: blog_post.id,
+          comment: {
+            body: 'Hello, comment!',
+            author_id: comment_author.id
+          }
+        }
+      end
     end
   end
 
