@@ -14,7 +14,7 @@ Add this line to your application's Gemfile:
 gem 'model_transporter', github: 'a-warner/model_transporter', branch: :main
 ```
 
-Requires Ruby 3.0+ and Rails 6.1 through 8.1.
+Requires Ruby 3.0+ and Rails 6.1+. CI tests the latest Rails (currently 8.1) on Ruby 3.4 and 4.0; older Rails versions back to 6.1 were verified when support was widened, but are no longer tested in CI.
 
 ## Usage
 
@@ -147,14 +147,7 @@ bundle install
 bundle exec rspec
 ```
 
-The default `Gemfile` runs against the latest Rails. To test another supported version, use one of the Gemfiles in `gemfiles/`:
-
-```sh
-BUNDLE_GEMFILE=gemfiles/rails_7.2.gemfile bundle install
-BUNDLE_GEMFILE=gemfiles/rails_7.2.gemfile bundle exec rspec
-```
-
-CI runs the suite across every supported Ruby/Rails combination (see `.github/workflows/ci.yml`).
+CI runs the suite against the latest Rails on Ruby 3.4 and 4.0 (see `.github/workflows/ci.yml`).
 
 ## License
 

@@ -3,8 +3,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in model_transporter.gemspec
 gemspec
 
-# Development/test dependencies. The default Gemfile targets the latest Rails;
-# see gemfiles/ for the older Rails versions tested in CI.
+# Development/test dependencies
 gem "rails", "~> 8.1.0"
 gem "sqlite3", ">= 2.1"
 

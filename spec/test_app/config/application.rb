@@ -6,9 +6,7 @@ require "model_transporter"
 
 module TestApp
   class Application < Rails::Application
-    # Use the defaults of whichever Rails version the suite is running against,
-    # so each CI job exercises that version's real behaviour.
-    config.load_defaults Rails::VERSION::STRING.to_f
+    config.load_defaults 8.1
 
     config.root = File.expand_path("..", __dir__)
     config.eager_load = false

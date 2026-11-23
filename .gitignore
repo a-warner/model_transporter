@@ -11,7 +11,5 @@
 .rspec_status
 tags
 
-# Per-Rails-version lockfiles are generated in CI
-/gemfiles/*.lock
 spec/test_app/log/
 spec/test_app/tmp/

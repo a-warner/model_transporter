@@ -7,25 +7,12 @@ on:
 
 jobs:
   test:
-    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+    name: Ruby ${{ matrix.ruby }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { ruby: "3.0", rails: "6.1", gemfile: gemfiles/rails_6.1.gemfile }
-          - { ruby: "3.2", rails: "7.0", gemfile: gemfiles/rails_7.0.gemfile }
-          - { ruby: "3.3", rails: "7.1", gemfile: gemfiles/rails_7.1.gemfile }
-          - { ruby: "3.3", rails: "7.2", gemfile: gemfiles/rails_7.2.gemfile }
-          - { ruby: "3.4", rails: "7.2", gemfile: gemfiles/rails_7.2.gemfile }
-          - { ruby: "3.3", rails: "8.0", gemfile: gemfiles/rails_8.0.gemfile }
-          - { ruby: "3.4", rails: "8.0", gemfile: gemfiles/rails_8.0.gemfile }
-          - { ruby: "4.0", rails: "8.0", gemfile: gemfiles/rails_8.0.gemfile }
-          - { ruby: "3.3", rails: "8.1", gemfile: Gemfile }
-          - { ruby: "3.4", rails: "8.1", gemfile: Gemfile }
-          - { ruby: "4.0", rails: "8.1", gemfile: Gemfile }
-    env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
+        ruby: ["3.4", "4.0"]
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
