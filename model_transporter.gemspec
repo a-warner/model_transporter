@@ -26,16 +26,13 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "listen"
-  spec.add_development_dependency "sqlite3", "~> 1.4"
-  spec.add_development_dependency "sass-rails", '>= 6'
-  spec.add_development_dependency "webpacker", "~> 4.0"
-  spec.add_development_dependency "pry"
+  spec.required_ruby_version = ">= 3.0"
 
-  spec.add_dependency "rails", "~> 6.1.3.2"
-  spec.add_dependency "request_store"
+  rails_requirement = [">= 6.1", "< 9"]
+  spec.add_dependency "activesupport", *rails_requirement
+  spec.add_dependency "activerecord", *rails_requirement
+  spec.add_dependency "actionpack", *rails_requirement
+  spec.add_dependency "actioncable", *rails_requirement
+  spec.add_dependency "railties", *rails_requirement
+  spec.add_dependency "request_store", ">= 1.5"
 end

@@ -11,8 +11,10 @@ If you have many users viewing the same objects in different sessions, stored in
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'model_transporter'
+gem 'model_transporter', github: 'a-warner/model_transporter', branch: :main
 ```
+
+Requires Ruby 3.0+ and Rails 6.1+. CI tests the latest Rails (currently 8.1) on Ruby 3.4 and 4.0; older Rails versions back to 6.1 were verified when support was widened, but are no longer tested in CI.
 
 ## Usage
 
@@ -104,7 +106,7 @@ ModelTransporter.configure do |config|
 end
 ```
 
-- `actor`: `ModelTransporter` includes an `actor_id` in message payloads, which can be useful if you want to determine who triggered a model update. If you have a controller method called `current_user`, you can set `actor` equal to `:current_user`, and `actor_id` in transporter payloads will get set to that user
+- `actor`: `ModelTransporter` includes an `actor_id` in message payloads, which can be useful if you want to determine who triggered a model update. If you have a controller method called `current_user` (public or not), you can set `actor` equal to `:current_user`, and `actor_id` in transporter payloads will get set to that user's `id`. You can also pass a proc, which is called with the controller: `config.actor = ->(controller) { controller.current_admin }`
 - `push_adapter`: by default `ModelTransporter` assumes you want to send updates via `ActionCable`. If you want to send updates in another way, e.g. something like `Pusher`, set a custom `push_adapter` to anything that responds to `push_update(channel, message)`. The default action cable push adapter, for reference, is:
 
 ```ruby
@@ -131,9 +133,21 @@ ModelTransporter::BatchModelUpdates.batch_model_updates do
 end
 ```
 
+## Options
+
+`notifies_model_updates` also accepts:
+
+- `id_key:` the attribute used to key models in the payload (default `:id`), e.g. `id_key: :hashid` if you don't expose database ids to clients
+- `on:` which events to send (default `%i(create update destroy)`)
+
 ## Run the specs
 
-`rake spec`
+```sh
+bundle install
+bundle exec rspec
+```
+
+CI runs the suite against the latest Rails on Ruby 3.4 and 4.0 (see `.github/workflows/ci.yml`).
 
 ## License
 
